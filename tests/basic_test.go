@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andyd/esent-go/api"
-	"github.com/andyd/esent-go/errors"
-	"github.com/andyd/esent-go/types"
+	"github.com/draper1/esent-go/api"
+	"github.com/draper1/esent-go/errors"
+	"github.com/draper1/esent-go/types"
 )
 
 func TestBasicTypes(t *testing.T) {

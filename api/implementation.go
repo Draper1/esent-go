@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/andyd/esent-go/errors"
-	"github.com/andyd/esent-go/native"
-	"github.com/andyd/esent-go/types"
+	"github.com/draper1/esent-go/errors"
+	"github.com/draper1/esent-go/native"
+	"github.com/draper1/esent-go/types"
 )
 
 // JetApi provides a basic implementation of the IJetApi interface

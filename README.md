@@ -41,8 +41,8 @@ The library successfully provides a Go interface to ESENT with comprehensive typ
 package main
 
 import (
-    "github.com/andyd/esent-go/api"
-    "github.com/andyd/esent-go/types"
+    "github.com/draper1/esent-go/api"
+    "github.com/draper1/esent-go/types"
 )
 
 func main() {

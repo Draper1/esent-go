@@ -3,8 +3,8 @@ package api
 import (
 	"time"
 
-	"github.com/andyd/esent-go/errors"
-	"github.com/andyd/esent-go/types"
+	"github.com/draper1/esent-go/errors"
+	"github.com/draper1/esent-go/types"
 )
 
 // IJetApi defines the interface for ESENT operations

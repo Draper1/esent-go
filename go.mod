@@ -1,3 +1,3 @@
-module github.com/andyd/esent-go
+module github.com/draper1/esent-go
 
 go 1.21
