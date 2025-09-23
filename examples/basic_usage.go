@@ -18,6 +18,29 @@ func main() {
 		log.Fatal("Failed to create JetApi instance")
 	}
 
+	// Set some system parameters before creating the instance
+	fmt.Println("Setting system parameters...")
+
+	// Set recovery to off for faster testing
+	err := jetApi.JetSetSystemParameter(nil, nil, types.JET_paramRecovery, 0, "off")
+	if err != nil {
+		log.Printf("Warning: Failed to set recovery parameter: %v", err)
+	}
+
+	// Set log file size to 64KB
+	err = jetApi.JetSetSystemParameter(nil, nil, types.JET_paramLogFileSize, 64, "")
+	if err != nil {
+		log.Printf("Warning: Failed to set log file size parameter: %v", err)
+	}
+
+	// Set base name for database files
+	err = jetApi.JetSetSystemParameter(nil, nil, types.JET_paramBaseName, 0, "EXM")
+	if err != nil {
+		log.Printf("Warning: Failed to set base name parameter: %v", err)
+	}
+
+	fmt.Println("System parameters set successfully")
+
 	// Create an ESENT instance
 	fmt.Println("Creating ESENT instance...")
 	instance, err := jetApi.JetCreateInstance2("ExampleInstance", "Example ESENT Instance", types.CreateInstanceGrbitNone)

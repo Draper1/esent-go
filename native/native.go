@@ -51,6 +51,8 @@ var (
 	jetGetTableInfo        *syscall.Proc
 	jetGetRecordSize       *syscall.Proc
 	jetGetRecordPosition   *syscall.Proc
+	jetSetSystemParameter  *syscall.Proc
+	jetGetDatabaseFileInfo *syscall.Proc
 )
 
 // safeFindProc safely finds a procedure, returning nil if not found
@@ -114,6 +116,8 @@ func Initialize() error {
 	jetGetTableInfo = safeFindProc(esentDll, "JetGetTableInfo")
 	jetGetRecordSize = safeFindProc(esentDll, "JetGetRecordSize")
 	jetGetRecordPosition = safeFindProc(esentDll, "JetGetRecordPosition")
+	jetSetSystemParameter = safeFindProc(esentDll, "JetSetSystemParameter")
+	jetGetDatabaseFileInfo = safeFindProc(esentDll, "JetGetDatabaseFileInfoW")
 
 	// Check if we have at least the basic functions
 	if jetCreateInstance2 == nil || jetInit2 == nil || jetTerm2 == nil {

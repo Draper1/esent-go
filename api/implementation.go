@@ -520,3 +520,39 @@ func (api *JetApi) JetGetRecordPosition(sesid *types.JET_SESID, tableid *types.J
 
 	return native.JetGetRecordPosition(sesid, tableid, 0)
 }
+
+// JetSetSystemParameter sets a system parameter for an ESENT instance
+func (api *JetApi) JetSetSystemParameter(instance *types.JET_INSTANCE, sesid *types.JET_SESID, param types.JET_param, paramValue uintptr, paramString string) error {
+	if !native.IsInitialized() {
+		return fmt.Errorf("native ESENT bindings not initialized")
+	}
+
+	return native.JetSetSystemParameter(instance, sesid, param, paramValue, paramString)
+}
+
+// JetGetDatabaseFileInfo gets information about a database file (int32 version)
+func (api *JetApi) JetGetDatabaseFileInfo(databaseName string, infoLevel types.JET_DbInfo) (int32, error) {
+	if !native.IsInitialized() {
+		return 0, fmt.Errorf("native ESENT bindings not initialized")
+	}
+
+	return native.JetGetDatabaseFileInfo(databaseName, infoLevel)
+}
+
+// JetGetDatabaseFileInfoLong gets information about a database file (int64 version)
+func (api *JetApi) JetGetDatabaseFileInfoLong(databaseName string, infoLevel types.JET_DbInfo) (int64, error) {
+	if !native.IsInitialized() {
+		return 0, fmt.Errorf("native ESENT bindings not initialized")
+	}
+
+	return native.JetGetDatabaseFileInfoLong(databaseName, infoLevel)
+}
+
+// JetGetDatabaseFileInfoMisc gets miscellaneous information about a database file
+func (api *JetApi) JetGetDatabaseFileInfoMisc(databaseName string, infoLevel types.JET_DbInfo) (*types.JET_DBINFOMISC, error) {
+	if !native.IsInitialized() {
+		return nil, fmt.Errorf("native ESENT bindings not initialized")
+	}
+
+	return native.JetGetDatabaseFileInfoMisc(databaseName, infoLevel)
+}

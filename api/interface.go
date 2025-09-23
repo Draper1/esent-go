@@ -73,4 +73,12 @@ type IJetApi interface {
 	// Utility functions
 	JetGetRecordSize(sesid *types.JET_SESID, tableid *types.JET_TABLEID) (*types.JET_RECSIZE, error)
 	JetGetRecordPosition(sesid *types.JET_SESID, tableid *types.JET_TABLEID) (*types.JET_RECPOS, error)
+
+	// System parameter functions
+	JetSetSystemParameter(instance *types.JET_INSTANCE, sesid *types.JET_SESID, param types.JET_param, paramValue uintptr, paramString string) error
+
+	// Database file information functions
+	JetGetDatabaseFileInfo(databaseName string, infoLevel types.JET_DbInfo) (int32, error)
+	JetGetDatabaseFileInfoLong(databaseName string, infoLevel types.JET_DbInfo) (int64, error)
+	JetGetDatabaseFileInfoMisc(databaseName string, infoLevel types.JET_DbInfo) (*types.JET_DBINFOMISC, error)
 }

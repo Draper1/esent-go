@@ -942,3 +942,113 @@ func JetBackup(backupPath string, grbit uint32, statusCallback interface{}) erro
 
 	return errors.JETErr(int32(ret))
 }
+
+// JetSetSystemParameter sets a system parameter for an ESENT instance
+func JetSetSystemParameter(instance *types.JET_INSTANCE, sesid *types.JET_SESID, param types.JET_param, paramValue uintptr, paramString string) error {
+	if !IsInitialized() || jetSetSystemParameter == nil {
+		return errors.JETErrInternalError
+	}
+
+	var instancePtr uintptr
+	if instance != nil {
+		instancePtr = instance.Value
+	}
+
+	var sesidPtr uintptr
+	if sesid != nil {
+		sesidPtr = sesid.Value
+	}
+
+	var paramStringPtr uintptr
+	if paramString != "" {
+		paramStringBytes, _ := syscall.BytePtrFromString(paramString)
+		paramStringPtr = uintptr(unsafe.Pointer(paramStringBytes))
+	}
+
+	ret, _, _ := jetSetSystemParameter.Call(
+		instancePtr,    // Pass instance value
+		sesidPtr,       // Pass sesid value
+		uintptr(param), // Pass parameter ID
+		paramValue,     // Pass parameter value
+		paramStringPtr, // Pass parameter string
+	)
+
+	if ret == 0 {
+		return nil
+	}
+
+	return errors.JETErr(int32(ret))
+}
+
+// JetGetDatabaseFileInfo gets information about a database file (int32 version)
+func JetGetDatabaseFileInfo(databaseName string, infoLevel types.JET_DbInfo) (int32, error) {
+	if !IsInitialized() {
+		return 0, errors.JETErrInternalError
+	}
+
+	if jetGetDatabaseFileInfo == nil {
+		return 0, errors.JETErrInternalError
+	}
+
+	databaseNamePtr, _ := syscall.BytePtrFromString(databaseName)
+	var result int32
+
+	ret, _, _ := jetGetDatabaseFileInfo.Call(
+		uintptr(unsafe.Pointer(databaseNamePtr)), // Pass database name pointer
+		uintptr(unsafe.Pointer(&result)),         // Pass result pointer (out parameter)
+		uintptr(unsafe.Sizeof(result)),           // Pass size of result
+		uintptr(infoLevel),                       // Pass info level
+	)
+
+	if ret == 0 {
+		return result, nil
+	}
+
+	return 0, errors.JETErr(int32(ret))
+}
+
+// JetGetDatabaseFileInfoLong gets information about a database file (int64 version)
+func JetGetDatabaseFileInfoLong(databaseName string, infoLevel types.JET_DbInfo) (int64, error) {
+	if !IsInitialized() || jetGetDatabaseFileInfo == nil {
+		return 0, errors.JETErrInternalError
+	}
+
+	databaseNamePtr, _ := syscall.BytePtrFromString(databaseName)
+	var result int64
+
+	ret, _, _ := jetGetDatabaseFileInfo.Call(
+		uintptr(unsafe.Pointer(databaseNamePtr)), // Pass database name pointer
+		uintptr(unsafe.Pointer(&result)),         // Pass result pointer
+		uintptr(unsafe.Sizeof(result)),           // Pass size of result
+		uintptr(infoLevel),                       // Pass info level
+	)
+
+	if ret == 0 {
+		return result, nil
+	}
+
+	return 0, errors.JETErr(int32(ret))
+}
+
+// JetGetDatabaseFileInfoMisc gets miscellaneous information about a database file
+func JetGetDatabaseFileInfoMisc(databaseName string, infoLevel types.JET_DbInfo) (*types.JET_DBINFOMISC, error) {
+	if !IsInitialized() || jetGetDatabaseFileInfo == nil {
+		return nil, errors.JETErrInternalError
+	}
+
+	databaseNamePtr, _ := syscall.BytePtrFromString(databaseName)
+	var result types.JET_DBINFOMISC
+
+	ret, _, _ := jetGetDatabaseFileInfo.Call(
+		uintptr(unsafe.Pointer(databaseNamePtr)), // Pass database name pointer
+		uintptr(unsafe.Pointer(&result)),         // Pass result pointer
+		uintptr(unsafe.Sizeof(result)),           // Pass size of result
+		uintptr(infoLevel),                       // Pass info level
+	)
+
+	if ret == 0 {
+		return &result, nil
+	}
+
+	return nil, errors.JETErr(int32(ret))
+}
