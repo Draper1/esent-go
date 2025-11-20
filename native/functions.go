@@ -144,7 +144,7 @@ func JetAttachDatabase(sesid *types.JET_SESID, databaseName string, grbit uint32
 	databaseNamePtr, _ := syscall.BytePtrFromString(databaseName)
 
 	ret, _, _ := jetAttachDatabase.Call(
-		uintptr(unsafe.Pointer(sesid)),
+		sesid.Value,
 		uintptr(unsafe.Pointer(databaseNamePtr)),
 		uintptr(grbit),
 	)
@@ -165,7 +165,7 @@ func JetDetachDatabase(sesid *types.JET_SESID, databaseName string) error {
 	databaseNamePtr, _ := syscall.BytePtrFromString(databaseName)
 
 	ret, _, _ := jetDetachDatabase.Call(
-		uintptr(unsafe.Pointer(sesid)),
+		sesid.Value,
 		uintptr(unsafe.Pointer(databaseNamePtr)),
 	)
 
@@ -186,9 +186,10 @@ func JetOpenDatabase(sesid *types.JET_SESID, databaseName string, grbit uint32) 
 	databaseNamePtr, _ := syscall.BytePtrFromString(databaseName)
 
 	ret, _, _ := jetOpenDatabase.Call(
-		uintptr(unsafe.Pointer(sesid)),
+		sesid.Value,
 		uintptr(unsafe.Pointer(databaseNamePtr)),
-		uintptr(unsafe.Pointer(&dbid)),
+		0, // szConnect (NULL)
+		uintptr(unsafe.Pointer(&dbid.Value)),
 		uintptr(grbit),
 	)
 
@@ -253,11 +254,13 @@ func JetOpenTable(sesid *types.JET_SESID, dbid *types.JET_DBID, tableName string
 	tableNamePtr, _ := syscall.BytePtrFromString(tableName)
 
 	ret, _, _ := jetOpenTable.Call(
-		uintptr(unsafe.Pointer(sesid)),
-		uintptr(unsafe.Pointer(dbid)),
+		sesid.Value,
+		uintptr(dbid.Value),
 		uintptr(unsafe.Pointer(tableNamePtr)),
-		uintptr(unsafe.Pointer(&tableid)),
+		0, // pvParameters (NULL)
+		0, // cbParameters
 		uintptr(grbit),
+		uintptr(unsafe.Pointer(&tableid)),
 	)
 
 	if ret == 0 {
@@ -292,7 +295,7 @@ func JetBeginTransaction(sesid *types.JET_SESID, grbit uint32) error {
 	}
 
 	ret, _, _ := jetBeginTransaction.Call(
-		uintptr(unsafe.Pointer(sesid)),
+		sesid.Value,
 		uintptr(grbit),
 	)
 
@@ -310,7 +313,7 @@ func JetCommitTransaction(sesid *types.JET_SESID, grbit uint32) error {
 	}
 
 	ret, _, _ := jetCommitTransaction.Call(
-		uintptr(unsafe.Pointer(sesid)),
+		sesid.Value,
 		uintptr(grbit),
 	)
 
@@ -328,7 +331,7 @@ func JetRollback(sesid *types.JET_SESID, grbit uint32) error {
 	}
 
 	ret, _, _ := jetRollback.Call(
-		uintptr(unsafe.Pointer(sesid)),
+		sesid.Value,
 		uintptr(grbit),
 	)
 
@@ -346,7 +349,7 @@ func JetBeginExternalBackup(instance *types.JET_INSTANCE, grbit types.BeginExter
 	}
 
 	ret, _, _ := jetBeginExternalBackup.Call(
-		uintptr(unsafe.Pointer(instance)),
+		instance.Value,
 		uintptr(grbit),
 	)
 
@@ -364,7 +367,7 @@ func JetEndExternalBackup(instance *types.JET_INSTANCE, grbit types.EndExternalB
 	}
 
 	ret, _, _ := jetEndExternalBackup.Call(
-		uintptr(unsafe.Pointer(instance)),
+		instance.Value,
 		uintptr(grbit),
 	)
 
@@ -398,7 +401,7 @@ func JetGetErrorInfo(errorCode int32, languageId uint32) (*types.JET_ERRINFOBASI
 }
 
 // JetGetDatabaseInfo gets database information
-func JetGetDatabaseInfo(sesid *types.JET_SESID, dbid *types.JET_DBID, infoLevel uint32, result []byte, maxResultSize uint32, actualResultSize *uint32) error {
+func JetGetDatabaseInfo(sesid *types.JET_SESID, dbid *types.JET_DBID, infoLevel uint32, result []byte, maxResultSize uint32) error {
 	if !IsInitialized() || jetGetDatabaseInfo == nil {
 		return errors.JETErrInternalError
 	}
@@ -408,18 +411,12 @@ func JetGetDatabaseInfo(sesid *types.JET_SESID, dbid *types.JET_DBID, infoLevel 
 		resultPtr = uintptr(unsafe.Pointer(&result[0]))
 	}
 
-	var actualResultSizePtr uintptr
-	if actualResultSize != nil {
-		actualResultSizePtr = uintptr(unsafe.Pointer(actualResultSize))
-	}
-
 	ret, _, _ := jetGetDatabaseInfo.Call(
-		uintptr(unsafe.Pointer(sesid)),
-		uintptr(unsafe.Pointer(dbid)),
-		uintptr(infoLevel),
+		sesid.Value,
+		uintptr(dbid.Value),
 		resultPtr,
 		uintptr(maxResultSize),
-		actualResultSizePtr,
+		uintptr(infoLevel),
 	)
 
 	if ret == 0 {
@@ -430,7 +427,7 @@ func JetGetDatabaseInfo(sesid *types.JET_SESID, dbid *types.JET_DBID, infoLevel 
 }
 
 // JetGetTableInfo gets table information
-func JetGetTableInfo(sesid *types.JET_SESID, tableid *types.JET_TABLEID, infoLevel uint32, result []byte, maxResultSize uint32, actualResultSize *uint32) error {
+func JetGetTableInfo(sesid *types.JET_SESID, tableid *types.JET_TABLEID, infoLevel uint32, result []byte, maxResultSize uint32) error {
 	if !IsInitialized() || jetGetTableInfo == nil {
 		return errors.JETErrInternalError
 	}
@@ -440,18 +437,12 @@ func JetGetTableInfo(sesid *types.JET_SESID, tableid *types.JET_TABLEID, infoLev
 		resultPtr = uintptr(unsafe.Pointer(&result[0]))
 	}
 
-	var actualResultSizePtr uintptr
-	if actualResultSize != nil {
-		actualResultSizePtr = uintptr(unsafe.Pointer(actualResultSize))
-	}
-
 	ret, _, _ := jetGetTableInfo.Call(
-		uintptr(unsafe.Pointer(sesid)),
-		uintptr(unsafe.Pointer(tableid)),
-		uintptr(infoLevel),
+		sesid.Value,
+		uintptr(tableid.Value),
 		resultPtr,
 		uintptr(maxResultSize),
-		actualResultSizePtr,
+		uintptr(infoLevel),
 	)
 
 	if ret == 0 {
@@ -470,10 +461,10 @@ func JetGetRecordSize(sesid *types.JET_SESID, tableid *types.JET_TABLEID, grbit 
 	var recsize types.JET_RECSIZE
 
 	ret, _, _ := jetGetRecordSize.Call(
-		uintptr(unsafe.Pointer(sesid)),
-		uintptr(unsafe.Pointer(tableid)),
-		uintptr(grbit),
+		sesid.Value,
+		uintptr(tableid.Value),
 		uintptr(unsafe.Pointer(&recsize)),
+		uintptr(grbit),
 	)
 
 	if ret == 0 {
@@ -484,7 +475,7 @@ func JetGetRecordSize(sesid *types.JET_SESID, tableid *types.JET_TABLEID, grbit 
 }
 
 // JetGetRecordPosition gets record position information
-func JetGetRecordPosition(sesid *types.JET_SESID, tableid *types.JET_TABLEID, grbit uint32) (*types.JET_RECPOS, error) {
+func JetGetRecordPosition(sesid *types.JET_SESID, tableid *types.JET_TABLEID) (*types.JET_RECPOS, error) {
 	if !IsInitialized() || jetGetRecordPosition == nil {
 		return nil, errors.JETErrInternalError
 	}
@@ -492,10 +483,10 @@ func JetGetRecordPosition(sesid *types.JET_SESID, tableid *types.JET_TABLEID, gr
 	var recpos types.JET_RECPOS
 
 	ret, _, _ := jetGetRecordPosition.Call(
-		uintptr(unsafe.Pointer(sesid)),
-		uintptr(unsafe.Pointer(tableid)),
-		uintptr(grbit),
+		sesid.Value,
+		uintptr(tableid.Value),
 		uintptr(unsafe.Pointer(&recpos)),
+		uintptr(unsafe.Sizeof(recpos)),
 	)
 
 	if ret == 0 {
@@ -562,23 +553,46 @@ func JetDeleteColumn(sesid *types.JET_SESID, tableid *types.JET_TABLEID, columnN
 
 // JetGetColumnInfo gets information about a column
 func JetGetColumnInfo(sesid *types.JET_SESID, tableid *types.JET_TABLEID, columnName string, grbit uint32) (*types.JET_COLUMNDEF, error) {
-	if !IsInitialized() || jetGetColumnInfo == nil {
+	if !IsInitialized() || jetGetTableColumnInfo == nil {
 		return nil, errors.JETErrInternalError
 	}
 
-	var columndef types.JET_COLUMNDEF
+	var nativeDef types.NATIVE_COLUMNDEF
+	nativeDef.CbStruct = uint32(unsafe.Sizeof(nativeDef))
+
 	columnNamePtr, _ := syscall.BytePtrFromString(columnName)
 
-	ret, _, _ := jetGetColumnInfo.Call(
+	// JetGetTableColumnInfo signature:
+	// JET_ERR JET_API JetGetTableColumnInfo(
+	//   __in          JET_SESID sesid,
+	//   __in          JET_TABLEID tableid,
+	//   __in          JET_PCSTR szColumnName,
+	//   __out         void* pvResult,
+	//   __in          unsigned long cbMax,
+	//   __in          unsigned long InfoLevel
+	// );
+
+	// Using InfoLevel = 0 (JET_ColInfo) which expects JET_COLUMNDEF result
+	ret, _, _ := jetGetTableColumnInfo.Call(
 		sesid.Value,                            // Pass sesid value
 		tableid.Value,                          // Pass tableid value
 		uintptr(unsafe.Pointer(columnNamePtr)), // Pass column name pointer
-		uintptr(grbit),                         // Pass grbit
-		uintptr(unsafe.Pointer(&columndef)),    // Pass reference to column definition
+		uintptr(unsafe.Pointer(&nativeDef)),    // Pass reference to native column definition
+		uintptr(nativeDef.CbStruct),            // Pass size of struct
+		0,                                      // InfoLevel (JET_ColInfo)
 	)
 
 	if ret == 0 {
-		return &columndef, nil
+		// Convert native struct to Go struct
+		columndef := &types.JET_COLUMNDEF{
+			Columnid:   types.JET_COLUMNID{Value: nativeDef.Columnid},
+			Coltyp:     types.Coltyp(nativeDef.Coltyp),
+			Grbit:      nativeDef.Grbit,
+			CbMax:      nativeDef.CbMax,
+			Cp:         uint32(nativeDef.Cp),
+			ColumnName: columnName,
+		}
+		return columndef, nil
 	}
 
 	return nil, errors.JETErr(int32(ret))
@@ -951,7 +965,9 @@ func JetSetSystemParameter(instance *types.JET_INSTANCE, sesid *types.JET_SESID,
 
 	var instancePtr uintptr
 	if instance != nil {
-		instancePtr = instance.Value
+		// Pass pointer to the instance value (handle)
+		// JetSetSystemParameter expects JET_INSTANCE* (which is ULONG_PTR*)
+		instancePtr = uintptr(unsafe.Pointer(&instance.Value))
 	}
 
 	var sesidPtr uintptr

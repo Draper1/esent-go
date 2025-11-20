@@ -518,7 +518,7 @@ func (api *JetApi) JetGetRecordPosition(sesid *types.JET_SESID, tableid *types.J
 		return nil, fmt.Errorf("native ESENT bindings not initialized")
 	}
 
-	return native.JetGetRecordPosition(sesid, tableid, 0)
+	return native.JetGetRecordPosition(sesid, tableid)
 }
 
 // JetSetSystemParameter sets a system parameter for an ESENT instance

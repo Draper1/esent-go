@@ -157,7 +157,7 @@ const (
 	AttachDatabaseGrbitReadOnly AttachDatabaseGrbit = 0x1
 
 	// AttachDatabaseGrbitDeleteCorrupted - Deletes corrupted databases during attachment.
-	AttachDatabaseGrbitDeleteCorrupted AttachDatabaseGrbit = 0x2
+	AttachDatabaseGrbitDeleteCorrupted AttachDatabaseGrbit = 0x10
 )
 
 // CreateTableGrbit represents options for JetCreateTable

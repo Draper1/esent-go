@@ -25,7 +25,6 @@ var (
 	jetCloseTable          *syscall.Proc
 	jetAddColumn           *syscall.Proc
 	jetDeleteColumn        *syscall.Proc
-	jetGetColumnInfo       *syscall.Proc
 	jetCreateIndex         *syscall.Proc
 	jetDeleteIndex         *syscall.Proc
 	jetPrepareUpdate       *syscall.Proc
@@ -49,6 +48,7 @@ var (
 	jetGetErrorInfo        *syscall.Proc
 	jetGetDatabaseInfo     *syscall.Proc
 	jetGetTableInfo        *syscall.Proc
+	jetGetTableColumnInfo  *syscall.Proc
 	jetGetRecordSize       *syscall.Proc
 	jetGetRecordPosition   *syscall.Proc
 	jetSetSystemParameter  *syscall.Proc
@@ -90,7 +90,6 @@ func Initialize() error {
 	jetCloseTable = safeFindProc(esentDll, "JetCloseTable")
 	jetAddColumn = safeFindProc(esentDll, "JetAddColumn")
 	jetDeleteColumn = safeFindProc(esentDll, "JetDeleteColumn")
-	jetGetColumnInfo = safeFindProc(esentDll, "JetGetColumnInfo")
 	jetCreateIndex = safeFindProc(esentDll, "JetCreateIndex")
 	jetDeleteIndex = safeFindProc(esentDll, "JetDeleteIndex")
 	jetPrepareUpdate = safeFindProc(esentDll, "JetPrepareUpdate")
@@ -109,11 +108,12 @@ func Initialize() error {
 	jetRollback = safeFindProc(esentDll, "JetRollback")
 	jetBackup = safeFindProc(esentDll, "JetBackup")
 	jetRestore = safeFindProc(esentDll, "JetRestore")
-	jetBeginExternalBackup = safeFindProc(esentDll, "JetBeginExternalBackup")
-	jetEndExternalBackup = safeFindProc(esentDll, "JetEndExternalBackup")
+	jetBeginExternalBackup = safeFindProc(esentDll, "JetBeginExternalBackupInstance")
+	jetEndExternalBackup = safeFindProc(esentDll, "JetEndExternalBackupInstance2")
 	jetGetErrorInfo = safeFindProc(esentDll, "JetGetErrorInfo")
 	jetGetDatabaseInfo = safeFindProc(esentDll, "JetGetDatabaseInfo")
 	jetGetTableInfo = safeFindProc(esentDll, "JetGetTableInfo")
+	jetGetTableColumnInfo = safeFindProc(esentDll, "JetGetTableColumnInfo")
 	jetGetRecordSize = safeFindProc(esentDll, "JetGetRecordSize")
 	jetGetRecordPosition = safeFindProc(esentDll, "JetGetRecordPosition")
 	jetSetSystemParameter = safeFindProc(esentDll, "JetSetSystemParameter")
