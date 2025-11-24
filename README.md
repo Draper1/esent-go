@@ -9,7 +9,6 @@ This project is currently in beta/work-in-progress status. While the core functi
 - Additional testing and validation needed for production use
 - Cross-platform support is not yet implemented
 - Performance optimization and benchmarking pending
-- Documentation and examples need expansion
 - Error handling needs further refinement
 
 The library successfully provides a Go interface to ESENT with comprehensive type coverage and graceful fallback mechanisms, but should be considered beta quality until the above items are addressed. Production use should include thorough testing and validation.
@@ -26,14 +25,23 @@ The library successfully provides a Go interface to ESENT with comprehensive typ
 - [x] Tests
 - [x] Basic example
 - [ ] Cross-platform support
+- [x] Documentation
 
 ## Structure
 
 - `types/` - Core ESENT types and enums
 - `api/` - API interfaces and implementations
+- `native/` - Native C Bindings for ESE
 - `errors/` - Error handling and codes
 - `tests/` - Test files
 - `examples/` - Usage examples
+
+## Documentation
+
+Full documentation is available in the [docs/](docs/) directory:
+- [Introduction & Usage](docs/index.md)
+- [Architecture](docs/architecture.md)
+- [API Reference](docs/api-reference.md)
 
 ## Usage
 
@@ -41,20 +49,43 @@ The library successfully provides a Go interface to ESENT with comprehensive typ
 package main
 
 import (
+    "fmt"
     "github.com/draper1/esent-go/api"
     "github.com/draper1/esent-go/types"
 )
 
 func main() {
-    // Initialize ESENT
-    instance := api.NewInstance()
-    defer instance.Term()
-    
-    // Create database
-    db, err := instance.CreateDatabase("test.db", types.CreateDatabaseGrbitNone)
+    // 1. Create API Instance
+    jetApi := api.NewJetApi()
+
+    // 2. Create and Initialize ESENT Instance
+    instance, err := jetApi.JetCreateInstance2("test_inst", "Test Instance", types.CreateInstanceGrbitNone)
     if err != nil {
         panic(err)
     }
+    
+    err = jetApi.JetInit2(instance, types.InitGrbitNone)
+    if err != nil {
+        panic(err)
+    }
+    defer jetApi.JetTerm2(instance, types.TermGrbitNone)
+    
+    // 3. Begin Session
+    sesid := &types.JET_SESID{}
+    err = jetApi.JetBeginSession(instance, sesid, "", "")
+    if err != nil {
+        panic(err)
+    }
+    defer jetApi.JetEndSession(sesid, 0)
+
+    // 4. Create Database
+    dbid, err := jetApi.JetCreateDatabase(sesid, "test.db", "test.db", types.CreateDatabaseGrbitNone)
+    if err != nil {
+        panic(err)
+    }
+    defer jetApi.JetCloseDatabase(sesid, dbid, 0)
+    
+    fmt.Println("Database created successfully!")
 }
 ```
 
@@ -96,7 +127,6 @@ The Windows implementation is complete with native ESENT bindings. Remaining wor
 1. **Cross-platform**: Research alternatives to ESENT for Linux/macOS
 2. **Performance**: Optimize for Go's memory model and concurrency
 3. **Error Handling**: Enhance error propagation and recovery
-4. **Documentation**: Create comprehensive API documentation
 
 ## Notes
 
